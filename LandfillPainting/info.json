@@ -1,0 +1,12 @@
+{
+  "name": "LandfillPainting",
+  "version": "0.4.0",
+  "factorio_version": "0.18",
+  "title": "Landfill Painting",
+  "author": "Trainwreck",
+  "description": "Adds some different types of terrain landfill, allows landfill to overwrite existing terrain",
+  "dependencies": [
+    "base >= 0.17",
+    "? angelsrefining"
+  ]
+}

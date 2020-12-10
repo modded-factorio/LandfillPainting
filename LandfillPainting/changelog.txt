@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.4.0
+Date: 25. 1. 2020
+  Changes:
+    - Factorio 0.18 update
+---------------------------------------------------------------------------------------------------
+Version: 0.3.2
+Date: 25. 9. 2019
+  Changes:
+    - Support 0.17.69 landfill texture and item.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.1
+Date: 8. 9. 2019
+  Changes:
+    - Fix nil item crash
+    - Make grass landfill place grass tiles, not grass textured landfill tiles.
+---------------------------------------------------------------------------------------------------
+Version: 0.3.0
+Date: 3. 3. 2019
+  Changes:
+    - Update for factorio 0.17
+    - Add option to disable landfill rotation
+---------------------------------------------------------------------------------------------------
+Version: 0.2.5
+Date: 6. 10. 2018
+  Changes:
+    - Fix for nanobots compatibility
+---------------------------------------------------------------------------------------------------
+Version: 0.2.4
+Date: 23. 6. 2018
+  Changes:
+    - Check item_to_place_this table exists
+---------------------------------------------------------------------------------------------------
+Version: 0.2.3
+Date: 23. 6. 2018
+  Changes:
+    - Use builtin factorio item_to_place_this table instead of building own copy.
+---------------------------------------------------------------------------------------------------
+Version: 0.2.2
+Date: 25. 2. 2018
+  Changes:
+    - Prevent landfill overwriting minable tiles (concrete, stone etc..)
+---------------------------------------------------------------------------------------------------
+Version: 0.2.1
+Date: 24. 1. 2018
+  Changes:
+    - Replacing terrain with a different variation of the same landfill item does not cost landfill.
+---------------------------------------------------------------------------------------------------
+Version: 0.2.0
+Date: 19. 12. 2017
+  Features:
+    - Update for factorio 0.16
+    - Reduce number of landfill types, each type now can paint multiple variations. Rotate while holding landfill in cursor to cycle variation.
+    - Previously unintended bot landfill placement feature is now enabled for all landfill types
