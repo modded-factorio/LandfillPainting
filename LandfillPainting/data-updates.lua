@@ -14,3 +14,6 @@ for _,v in pairs(data.raw.tile) do
     end
   end
 end
+
+bobmods.lib.tech.remove_recipe_unlock('water-washing-2', 'solid-mud-landfill')
+bobmods.lib.tech.add_recipe_unlock('water-washing-1', 'solid-mud-landfill')
