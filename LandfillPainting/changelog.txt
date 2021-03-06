@@ -1,9 +1,10 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.5.1
-Date: ???
+Date: 06.03.2021
   Changes:
     - Moved landfill recipe from Washing 2 to Washing 1
     - Default value changed to false for setting Rotate to select landfill variation
+    - Update Japanese locale
 ---------------------------------------------------------------------------------------------------
 Version: 0.5.0
 Date: 29. 11. 2020
