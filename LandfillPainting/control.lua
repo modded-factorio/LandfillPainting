@@ -33,7 +33,7 @@ local function tilebuilt(e)
   local placeitem = e.item.name
   local refundcount = 0
   for _,v in pairs(e.tiles) do
-    if tilelookup[v.old_tile.name] == placeitem then
+    if tilelookup[v.old_tile.name] ~= nil then
       refundcount = refundcount + 1
     end
   end
