@@ -14,8 +14,7 @@ local tilelookup =
   ['grass-2'] = 'landfill-grass-1',
   ['grass-3'] = 'landfill-grass-1',
   ['grass-4'] = 'landfill-grass-1',
-  --['landfill'] = 'landfill',
-
+  
   ['red-desert-0'] = 'landfill-red-desert-1',
   ['red-desert-1'] = 'landfill-red-desert-1',
   ['red-desert-2'] = 'landfill-red-desert-1',
@@ -23,44 +22,61 @@ local tilelookup =
 
   ['sand-1'] = 'landfill-sand-3',
   ['sand-2'] = 'landfill-sand-3',
-  ['sand-3'] = 'landfill-sand-3'
+  ['sand-3'] = 'landfill-sand-3',
+
+  ['landfill'] = 'landfill',
 }
 
 local function tilebuilt(e)
   if not e.item then
-    return {count = 0}
+    return {}
   end
-  local placeitem = e.item.name
-  local refundcount = 0
+
+  local refunds = {}
+  local total = 0
   for _,v in pairs(e.tiles) do
-    if tilelookup[v.old_tile.name] == placeitem then
-      refundcount = refundcount + 1
+    local refunditem = tilelookup[v.old_tile.name]
+    if refunditem then
+      refunds[refunditem] = (refunds[refunditem] or 0) + 1
+      total = total + 1
     end
   end
-  return {name = placeitem, count = refundcount}
+
+  return refunds, total
 end
 
 script.on_event(defines.events.on_player_built_tile, function(e)
-  local refund = tilebuilt(e)
-  if refund.count > 0 and e.stack and e.item and e.stack.valid then
+  local refunds,_ = tilebuilt(e)
+  
+  if e.stack and e.stack.valid and e.item and refunds[e.item.name] and refunds[e.item.name] > 0 then
+    local refundname = e.item.name
+    
     local holding = 0
     if e.stack.valid_for_read then
       holding = e.stack.count
     end
-    local fill = math.min(e.item.stack_size - holding, refund.count)
+    
+    local fill = math.min(e.item.stack_size - holding, refunds[refundname])
     if fill > 0 then
-      e.stack.transfer_stack({name = refund.name, count = fill})
-      refund.count = refund.count - fill
+      e.stack.transfer_stack({name = refundname, count = fill})
+      refunds[refundname] = refunds[refundname] - fill
     end
   end
-  if refund.count > 0 then
-    game.players[e.player_index].insert(refund)
+
+  for refundname, refundcount in pairs(refunds) do
+    if refundcount > 0 then
+      game.players[e.player_index].insert( { name = refundname, count = refundcount } )
+    end
   end
+
 end)
 
 script.on_event(defines.events.on_robot_built_tile, function(e)
-  local refund = tilebuilt(e)
-  if refund.count > 0 then
-    e.robot.get_inventory(defines.inventory.robot_cargo).insert(refund)
+  local refunds, total = tilebuilt(e)
+  
+  -- a robot can't carry multiple stacks, so take first stack and insert it with total amount
+  local firstrefundname,_ = next(refunds)
+  if firstrefundname then
+    e.robot.get_inventory(defines.inventory.robot_cargo).insert( { name = firstrefundname, count = total } )
   end
 end)
