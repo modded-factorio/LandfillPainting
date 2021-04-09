@@ -13,7 +13,7 @@ local tilelookup =
   ['grass-1'] = 'landfill-grass-1',
   ['grass-2'] = 'landfill-grass-1',
   ['grass-3'] = 'landfill-grass-1',
-  ['grass-4'] = 'landfill-grass-1',
+  ['grass-4'] = 'landfill-grass-1',  
   --['landfill'] = 'landfill',
 
   ['red-desert-0'] = 'landfill-red-desert-1',
@@ -26,6 +26,8 @@ local tilelookup =
   ['sand-3'] = 'landfill-sand-3'
 }
 
+local always_refund_sand_islands = settings.startup['landfillpainting-always-refund-sand-islands'].value
+
 local function tilebuilt(e)
   if not e.item then
     return {count = 0}
@@ -33,7 +35,9 @@ local function tilebuilt(e)
   local placeitem = e.item.name
   local refundcount = 0
   for _,v in pairs(e.tiles) do
-    if tilelookup[v.old_tile.name] == placeitem then
+    local oldname = v.old_tile.name
+    if tilelookup[oldname] == placeitem 
+        or (always_refund_sand_islands and (oldname == 'sand-1' or oldname == 'sand-2')) then
       refundcount = refundcount + 1
     end
   end
