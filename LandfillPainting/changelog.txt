@@ -3,6 +3,7 @@ Version: 0.5.2
 Date: ???
   Bugfixes:
     - Landfill item shows default tooltip if rotation setting is off
+    - Removed implicit dependency on boblibrary
 ---------------------------------------------------------------------------------------------------
 Version: 0.5.1
 Date: 06.03.2021
