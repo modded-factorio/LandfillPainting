@@ -89,6 +89,10 @@ data.raw.item['landfill'].place_as_tile.condition = {'layer-15'}
 -- red-desert-1 -> red-desert-2 -> red-desert-3 -> red-desert-4
 -- sand-3 -> sand-1 -> sand-2
 if settings.startup['landfillpainting-use-rotation'].value then
+  for _,v in ipairs(terrains) do
+    data.raw.item['landfill-' .. v].localised_description = {'item-description.landfillR'}
+  end
+
   data.raw.tile['dry-dirt'].next_direction = 'dirt-1'
   data.raw.tile['dirt-1'].next_direction = 'dirt-2'
   data.raw.tile['dirt-2'].next_direction = 'dirt-3'
