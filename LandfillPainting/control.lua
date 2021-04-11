@@ -14,7 +14,7 @@ local tilelookup =
   ['grass-2'] = 'landfill-grass-1',
   ['grass-3'] = 'landfill-grass-1',
   ['grass-4'] = 'landfill-grass-1',
-  --['landfill'] = 'landfill',
+  ['landfill'] = 'landfill',
 
   ['red-desert-0'] = 'landfill-red-desert-1',
   ['red-desert-1'] = 'landfill-red-desert-1',
@@ -26,6 +26,12 @@ local tilelookup =
   ['sand-3'] = 'landfill-sand-3'
 }
 
+sb_tiles = 
+{
+  ['sand-4'] = true,
+  ['sand-5'] = true
+}
+
 local function tilebuilt(e)
   if not e.item then
     return {count = 0}
@@ -33,7 +39,7 @@ local function tilebuilt(e)
   local placeitem = e.item.name
   local refundcount = 0
   for _,v in pairs(e.tiles) do
-    if tilelookup[v.old_tile.name] == placeitem then
+    if (tilelookup[v.old_tile.name] == placeitem) or sb_tiles[v.old_tile.name] then
       refundcount = refundcount + 1
     end
   end
