@@ -1,4 +1,7 @@
 require "util"
+local collision_mask_util = require("collision-mask-util")
+
+CUSTOM_LAYER = collision_mask_util.get_first_unused_layer()
 
 local function findname(t, name)
   for i,v in ipairs(t) do
@@ -64,7 +67,7 @@ for _,v in ipairs(terrains) do
     {
       result = v,
       condition_size = 1,
-      condition = {'layer-15'}
+      condition = {CUSTOM_LAYER}
     }
   }
   local recipe = util.table.deepcopy(baserecipe)
@@ -81,7 +84,7 @@ for _,v in ipairs(terrains) do
 end
 
 data.raw.item['landfill'].icon = "__LandfillPainting__/graphics/icons/landfill-landfill.png"
-data.raw.item['landfill'].place_as_tile.condition = {'layer-15'}
+data.raw.item['landfill'].place_as_tile.condition = {CUSTOM_LAYER}
 
 -- dry-dirt -> dirt-1 -> dirt-2 ->dirt-3
 -- dirt-4 -> dirt-5 -> dirt-6 -> dirt-7
