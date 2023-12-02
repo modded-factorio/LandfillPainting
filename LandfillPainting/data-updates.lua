@@ -2,7 +2,7 @@ for _,v in pairs(data.raw.tile) do
   if v.minable then
     local found = false
     for _,c in pairs(v.collision_mask or {}) do
-      if c == 'layer-15' then
+      if c == LANDFILL_PAINTING_LAYER then
         found = true
       end
     end
@@ -10,7 +10,7 @@ for _,v in pairs(data.raw.tile) do
       if not v.collision_mask then
         v.collision_mask = {}
       end
-      table.insert(v.collision_mask, 'layer-15')
+      table.insert(v.collision_mask, LANDFILL_PAINTING_LAYER)
     end
   end
 end
