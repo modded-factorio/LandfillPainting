@@ -1,16 +1,27 @@
+-- Define the names of each terrain type we're adding
+local terrains = {
+  "dry-dirt",
+  "dirt-4",
+  "grass-1",
+  "red-desert-1",
+  "sand-3"
+}
+
 for _, force in pairs(game.forces) do
   force.reset_technologies()
   force.reset_recipes()
+  
+  -- Get appropriate technology
   local tech = force.technologies['landfill']
-  if force.technologies['water-washing'] and force.technologies['water-washing'].enabled then
+  if force.technologies['water-washing'] and 
+     force.technologies['water-washing'].enabled then
     tech = force.technologies['water-washing']
   end
-  if tech.researched then
-    for _,v in ipairs(tech.effects) do
-      if v.type == 'unlock-recipe' then
-        force.recipes[v.recipe].enabled = true
-      end
+
+  -- Enable recipes if technology is researched
+  if tech and tech.researched then
+    for i,v in ipairs(terrains) do
+      force.recipes['landfill-' .. v].enabled = true
     end
   end
 end
-

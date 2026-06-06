@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.6.0
+Date: 23.11.2024
+  Changes:
+    - Update for Factorio 2.0
+    - Allowed landfill to be placed over any existing tile (including other landfill types and concrete) 
+---------------------------------------------------------------------------------------------------
 Version: 0.5.3
 Date: 02.12.2023
   Bugfixes:

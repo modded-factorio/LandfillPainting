@@ -1,16 +1,12 @@
 require "util"
-local collision_mask_util = require("collision-mask-util")
 
-LANDFILL_PAINTING_LAYER = collision_mask_util.get_first_unused_layer()
+-- Collision masks have been replaced with CollisionMaskConnector prototypes in 2.0, which contains a property "layers"
+-- Settings layers to empty means that the tile can be placed on top of anything
+LANDFILL_COLLISION_MASK_CONNECTOR = {
+  layers = {}
+}
 
-local function findname(t, name)
-  for i,v in ipairs(t) do
-    if v.name == name then
-      return v
-    end
-  end
-end
-
+-- Define the names of each terrain type we're adding
 local terrains = {
   "dry-dirt",
   "dirt-4",
@@ -18,14 +14,17 @@ local terrains = {
   "red-desert-1",
   "sand-3"
 }
+
+-- Define the localised names of each terrain type we're adding, additional localised names can be added in lanfillpainting/locale
 local names = {
-  ["dry-dirt"] = "tile-name.dry-dirt",
-  ["dirt-4"] = "autoplace-control-names.dirt",
-  ["grass-1"] = "autoplace-control-names.grass",
-  ["red-desert-1"] = "autoplace-control-names.desert",
-  ["sand-3"] = "autoplace-control-names.sand"
+  ["dry-dirt"] ="tile-name.dry-dirt",
+  ["dirt-4"] = "tile-name.dirt",
+  ["grass-1"] = "tile-name.grass",
+  ["red-desert-1"] = "tile-name.desert",
+  ["sand-3"] = "tile-name.sand"
 }
 
+-- Get the vanilla landfill recipe and technology prototypes
 local baserecipe = data.raw.recipe['landfill']
 local technology = data.raw.technology['landfill']
 
@@ -52,11 +51,12 @@ else
   baserecipe.subgroup = "terrain-landfill"
 end
 
-for _,v in ipairs(terrains) do
+-- Add new items and recipes for each terrain type
+for i,v in ipairs(terrains) do
   local item = {
     type = "item",
     name = "landfill-" .. v,
-    localised_name = {names[v]},
+    localised_name = {v .. '-name.name'},
     localised_description = {"item-description.landfill"},
     icon = "__LandfillPainting__/graphics/icons/landfill-" .. v .. ".png",
     icon_size = 64, icon_mipmaps = 4,
@@ -67,8 +67,8 @@ for _,v in ipairs(terrains) do
     {
       result = v,
       condition_size = 1,
-      condition = {LANDFILL_PAINTING_LAYER}
-    }
+      condition = LANDFILL_COLLISION_MASK_CONNECTOR
+    },
   }
   local recipe = util.table.deepcopy(baserecipe)
   recipe.name = "landfill-" .. v
@@ -83,8 +83,10 @@ for _,v in ipairs(terrains) do
   table.insert(technology.effects, { type = "unlock-recipe", recipe = "landfill-" .. v })
 end
 
+
+
 data.raw.item['landfill'].icon = "__LandfillPainting__/graphics/icons/landfill-landfill.png"
-data.raw.item['landfill'].place_as_tile.condition = {LANDFILL_PAINTING_LAYER}
+data.raw.item['landfill'].place_as_tile.condition = LANDFILL_COLLISION_MASK_CONNECTOR
 
 -- dry-dirt -> dirt-1 -> dirt-2 ->dirt-3
 -- dirt-4 -> dirt-5 -> dirt-6 -> dirt-7
@@ -144,4 +146,11 @@ local allterrain = {
 }
 for _,v in pairs(allterrain) do
   data.raw.tile[v].can_be_part_of_blueprint = nil
+
+  -- Enable vanilla landfill to be replace all types of terrain that LandfillPainter allows the player to create
+  if data.raw.item['landfill'].place_as_tile.tile_condition then
+    table.insert(data.raw.item['landfill'].place_as_tile.tile_condition, v)
+  else
+    data.raw.item['landfill'].place_as_tile.tile_condition = {v}
+  end
 end
