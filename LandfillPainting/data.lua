@@ -48,23 +48,22 @@ if mods["angelssmelting"] and data.raw.technology["angels-water-washing-1"] and
    (data.raw.technology["angels-water-washing-1"].enabled == nil or data.raw.technology["angels-water-washing-1"].enabled) and
    data.raw.recipe["angels-solid-mud-landfill"] then
   baserecipe = data.raw.recipe["angels-solid-mud-landfill"]
-  technology = data.raw.technology["angels-water-washing-1"]
   data:extend({{
     type = "item-subgroup",
-    name = "water-landfill",
+    name = "landfill",
     group = "angels-water-treatment",
     order = "eb"
   }})
-  baserecipe.subgroup = "water-landfill"
+  baserecipe.subgroup = "landfill"
   baserecipe.order = nil
 else
   data:extend({{
     type = "item-subgroup",
-    name = "terrain-landfill",
+    name = "landfill",
     group = "logistics",
     order = "hb"
   }})
-  baserecipe.subgroup = "terrain-landfill"
+  baserecipe.subgroup = "landfill"
 end
 
 local function add_recipe_unlock(recipe_name)
@@ -91,7 +90,7 @@ for item_name, tile_name in pairs(item_tile_map) do
       localised_description = { "item-description.landfill" },
       icon = "__LandfillPainting__/graphics/icons/" .. item_name .. ".png",
       icon_size = 64,
-      subgroup = "terrain",
+      subgroup = "landfill",
       order = "c[landfill]-a[" .. item_name .. "]",
       stack_size = 100,
       place_as_tile =
@@ -103,11 +102,13 @@ for item_name, tile_name in pairs(item_tile_map) do
         tile_condition = table.deepcopy(overwritable_tiles),
       },
     }
-    local recipe = util.table.deepcopy(baserecipe)
-    recipe.name = item_name
-    recipe.results = {{ type = "item", name = item_name, amount = 1 }}
-
-    data:extend({item, recipe})
+    data:extend({item})
+    if not data.raw.recipe[item_name] then
+      local recipe = util.table.deepcopy(baserecipe)
+      recipe.name = item_name
+      recipe.results = {{ type = "item", name = item_name, amount = 1 }}
+      data:extend({recipe})
+    end
     add_recipe_unlock(item_name)
   end
 end

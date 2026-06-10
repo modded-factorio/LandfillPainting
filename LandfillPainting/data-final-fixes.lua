@@ -1,2 +1,2 @@
-data.raw.item['landfill'].subgroup = 'terrain'
-data.raw.item['landfill'].order = 'c[landfill]-a[landfill]'
+data.raw.item["landfill"].subgroup = "landfill"
+data.raw.item["landfill"].order = "c[landfill]-a[landfill]"
