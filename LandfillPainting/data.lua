@@ -1,42 +1,60 @@
 require "util"
+local tile_sounds = require("__base__/prototypes/tile/tile-sounds")
 
--- Collision masks have been replaced with CollisionMaskConnector prototypes in 2.0, which contains a property "layers"
--- Settings layers to empty means that the tile can be placed on top of anything
-LANDFILL_COLLISION_MASK_CONNECTOR = {
-  layers = {}
+-- Define the names and tile type lanfill we are adding
+local item_tile_map = {
+  ["landfill-dry-dirt"] = "dry-dirt",
+  ["landfill-dirt"] = "dirt-4",
+  ["landfill-grass"] = "grass-1",
+  ["landfill-red-desert"] = "red-desert-1",
+  ["landfill-sand"] = "sand-3",
+  ["landfill"] = "landfill",
 }
 
--- Define the names of each terrain type we're adding
-local terrains = {
-  "dry-dirt",
-  "dirt-4",
-  "grass-1",
-  "red-desert-1",
-  "sand-3"
-}
+local tile_item_map = {}
+local overwritable_tiles = data.raw.item["landfill"].place_as_tile.tile_condition
 
--- Define the localised names of each terrain type we're adding, additional localised names can be added in lanfillpainting/locale
-local names = {
-  ["dry-dirt"] ="tile-name.dry-dirt",
-  ["dirt-4"] = "tile-name.dirt",
-  ["grass-1"] = "tile-name.grass",
-  ["red-desert-1"] = "tile-name.desert",
-  ["sand-3"] = "tile-name.sand"
-}
+for tile_name, item_name in pairs({
+  ["dry-dirt"] = "landfill-dry-dirt",
+  ["dirt-1"] = "landfill-dirt",
+  ["dirt-2"] = "landfill-dirt",
+  ["dirt-3"] = "landfill-dirt",
+  ["dirt-4"] = "landfill-dirt",
+  ["dirt-5"] = "landfill-dirt",
+  ["dirt-6"] = "landfill-dirt",
+  ["dirt-7"] = "landfill-dirt",
+  ["grass-1"] = "landfill-grass",
+  ["grass-2"] = "landfill-grass",
+  ["grass-3"] = "landfill-grass",
+  ["grass-4"] = "landfill-grass",
+  ["landfill"] = "landfill",
+  ["red-desert-0"] = "landfill-red-desert",
+  ["red-desert-1"] = "landfill-red-desert",
+  ["red-desert-2"] = "landfill-red-desert",
+  ["red-desert-3"] = "landfill-red-desert",
+  ["sand-1"] = "landfill-sand",
+  ["sand-2"] = "landfill-sand",
+  ["sand-3"] = "landfill-sand",
+}) do
+  if data.raw.tile[tile_name] then
+    tile_item_map[tile_name] = item_name
+    table.insert(overwritable_tiles, tile_name)
+  end
+end
 
 -- Get the vanilla landfill recipe and technology prototypes
-local baserecipe = data.raw.recipe['landfill']
-local technology = data.raw.technology['landfill']
+local baserecipe = data.raw.recipe["landfill"]
+local technology = data.raw.technology["landfill"]
 
-if mods['angelssmelting'] and data.raw.technology['water-washing-1'] and
-   (data.raw.technology['water-washing-1'].enabled == nil or data.raw.technology['water-washing-1'].enabled) and
-   data.raw.recipe['solid-mud-landfill'] then
-  baserecipe = data.raw.recipe['solid-mud-landfill']
-  technology = data.raw.technology['water-washing-1']
+if mods["angelssmelting"] and data.raw.technology["angels-water-washing-1"] and
+   (data.raw.technology["angels-water-washing-1"].enabled == nil or data.raw.technology["angels-water-washing-1"].enabled) and
+   data.raw.recipe["angels-solid-mud-landfill"] then
+  baserecipe = data.raw.recipe["angels-solid-mud-landfill"]
+  technology = data.raw.technology["angels-water-washing-1"]
   data:extend({{
     type = "item-subgroup",
     name = "water-landfill",
-    group = "water-treatment",
+    group = "angels-water-treatment",
     order = "eb"
   }})
   baserecipe.subgroup = "water-landfill"
@@ -51,106 +69,53 @@ else
   baserecipe.subgroup = "terrain-landfill"
 end
 
+local function add_recipe_unlock(recipe_name)
+  local addit = true
+  if not technology.effects then
+    technology.effects = {}
+  end
+  for _, effect in pairs(technology.effects) do
+    if effect.type == "unlock-recipe" and effect.recipe == recipe_name then
+      addit = false
+    end
+  end
+  if addit then
+    table.insert(technology.effects, { type = "unlock-recipe", recipe = recipe_name })
+  end
+end
+
 -- Add new items and recipes for each terrain type
-for i,v in ipairs(terrains) do
+for item_name, tile_name in pairs(item_tile_map) do
   local item = {
     type = "item",
-    name = "landfill-" .. v,
-    localised_name = {v .. '-name.name'},
-    localised_description = {"item-description.landfill"},
-    icon = "__LandfillPainting__/graphics/icons/landfill-" .. v .. ".png",
-    icon_size = 64, icon_mipmaps = 4,
+    name = item_name,
+    localised_description = { "item-description.landfill" },
+    icon = "__LandfillPainting__/graphics/icons/" .. item_name .. ".png",
+    icon_size = 64,
     subgroup = "terrain",
-    order = "c[landfill]-a[" .. v .. "]",
+    order = "c[landfill]-a[" .. item_name .. "]",
     stack_size = 100,
     place_as_tile =
     {
-      result = v,
+      result = tile_name,
       condition_size = 1,
-      condition = LANDFILL_COLLISION_MASK_CONNECTOR
+      --condition = { layers = { ground_tile = true }},
+      condition = { layers = {} },
+      -- Enable all types of terrain that LandfillPainter allows the player to create to replace each other
+      tile_condition = table.deepcopy(overwritable_tiles),
     },
   }
   local recipe = util.table.deepcopy(baserecipe)
-  recipe.name = "landfill-" .. v
-  if recipe.results then
-    recipe.results[1].name = "landfill-" .. v
-  else
-    recipe.result = "landfill-" .. v
-  end
+  recipe.name = item_name
+  recipe.results = {{ type = "item", name = item_name, amount = 1 }}
 
-  data:extend({item})
-  data:extend({recipe})
-  table.insert(technology.effects, { type = "unlock-recipe", recipe = "landfill-" .. v })
+  data:extend({item, recipe})
+  add_recipe_unlock(item_name)
 end
 
-
-
-data.raw.item['landfill'].icon = "__LandfillPainting__/graphics/icons/landfill-landfill.png"
-data.raw.item['landfill'].place_as_tile.condition = LANDFILL_COLLISION_MASK_CONNECTOR
-
--- dry-dirt -> dirt-1 -> dirt-2 ->dirt-3
--- dirt-4 -> dirt-5 -> dirt-6 -> dirt-7
--- grass-1 -> grass-3 -> grass-2 -> grass-4
--- red-desert-1 -> red-desert-2 -> red-desert-3 -> red-desert-4
--- sand-3 -> sand-1 -> sand-2
-if settings.startup['landfillpainting-use-rotation'].value then
-  for _,v in ipairs(terrains) do
-    data.raw.item['landfill-' .. v].localised_description = {'item-description.landfillR'}
-  end
-
-  data.raw.tile['dry-dirt'].next_direction = 'dirt-1'
-  data.raw.tile['dirt-1'].next_direction = 'dirt-2'
-  data.raw.tile['dirt-2'].next_direction = 'dirt-3'
-  data.raw.tile['dirt-3'].next_direction = 'dry-dirt'
-
-  data.raw.tile['dirt-4'].next_direction = 'dirt-5'
-  data.raw.tile['dirt-5'].next_direction = 'dirt-6'
-  data.raw.tile['dirt-6'].next_direction = 'dirt-7'
-  data.raw.tile['dirt-7'].next_direction = 'dirt-4'
-
-  data.raw.tile['grass-1'].next_direction = 'grass-3'
-  data.raw.tile['grass-3'].next_direction = 'grass-2'
-  data.raw.tile['grass-2'].next_direction = 'grass-4'
-  data.raw.tile['grass-4'].next_direction = 'grass-1'
-
-  data.raw.tile['red-desert-0'].next_direction = 'red-desert-1'
-  data.raw.tile['red-desert-1'].next_direction = 'red-desert-2'
-  data.raw.tile['red-desert-2'].next_direction = 'red-desert-3'
-  data.raw.tile['red-desert-3'].next_direction = 'red-desert-0'
-
-  data.raw.tile['sand-3'].next_direction = 'sand-1'
-  data.raw.tile['sand-1'].next_direction = 'sand-2'
-  data.raw.tile['sand-2'].next_direction = 'sand-3'
-end
-
-local allterrain = {
-  'dry-dirt',
-  'dirt-1',
-  'dirt-2',
-  'dirt-3',
-  'dirt-4',
-  'dirt-5',
-  'dirt-6',
-  'dirt-7',
-  'grass-1',
-  'grass-2',
-  'grass-3',
-  'grass-4',
-  'red-desert-0',
-  'red-desert-1',
-  'red-desert-2',
-  'red-desert-3',
-  'sand-1',
-  'sand-2',
-  'sand-3'
-}
-for _,v in pairs(allterrain) do
-  data.raw.tile[v].can_be_part_of_blueprint = nil
-
-  -- Enable vanilla landfill to be replace all types of terrain that LandfillPainter allows the player to create
-  if data.raw.item['landfill'].place_as_tile.tile_condition then
-    table.insert(data.raw.item['landfill'].place_as_tile.tile_condition, v)
-  else
-    data.raw.item['landfill'].place_as_tile.tile_condition = {v}
-  end
+for tile_name, item_name in pairs(tile_item_map) do
+  local tile = data.raw.tile[tile_name]
+  tile.can_be_part_of_blueprint = nil
+  tile.is_foundation = true
+  tile.build_sound = tile_sounds.building.landfill
 end

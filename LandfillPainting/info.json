@@ -1,9 +1,9 @@
 {
   "name": "LandfillPainting",
-  "version": "0.6.0",
+  "version": "2.0.0",
   "factorio_version": "2.0",
   "title": "Landfill Painting",
-  "author": "Trainwreck",
+  "author": "Trainwreck, KiwiHawk",
   "description": "Adds some different types of terrain landfill, allows landfill to overwrite existing terrain",
   "dependencies": [
     "base",
