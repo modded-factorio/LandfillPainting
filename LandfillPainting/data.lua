@@ -1,5 +1,6 @@
 require "util"
 local tile_sounds = require("__base__/prototypes/tile/tile-sounds")
+local sounds = require("__base__/prototypes/entity/sounds")
 
 -- Define the names and tile type landfill we are adding
 local item_tile_map = {
@@ -118,5 +119,9 @@ for item_name, tile_name in pairs(item_tile_map) do
   if tile then
     tile.can_be_part_of_blueprint = nil
     tile.build_sound = tile_sounds.building.landfill
+    tile.minable = {mining_time = 0.5, result = item_name}
+    tile.mined_sound = sounds.deconstruct_bricks(0.8)
+    tile.placeable_by = {item = item_name, count = 1}
+    tile.is_foundation = true
   end
 end
