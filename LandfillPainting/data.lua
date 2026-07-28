@@ -1,14 +1,13 @@
 require "util"
-local tile_sounds = require("__base__/prototypes/tile/tile-sounds")
-local sounds = require("__base__/prototypes/entity/sounds")
+local tile_sounds = require("__base__/prototypes/tile/tile-sounds"
 
 -- Define the names and tile type landfill we are adding
 local item_tile_map = {
-  ["landfill-dry-dirt"] = "dry-dirt",
-  ["landfill-dirt"] = "dirt-4",
-  ["landfill-grass"] = "grass-1",
-  ["landfill-red-desert"] = "red-desert-1",
-  ["landfill-sand"] = "sand-3",
+  ["landfill-dry-dirt"] = "lp-dry-dirt",
+  ["landfill-dirt"] = "lp-dirt-4",
+  ["landfill-grass"] = "lp-grass-1",
+  ["landfill-red-desert"] = "lp-red-desert-1",
+  ["landfill-sand"] = "lp-sand-3",
   ["landfill"] = "landfill",
 }
 
@@ -84,43 +83,51 @@ end
 
 -- Add new items and recipes for each terrain type
 for item_name, tile_name in pairs(item_tile_map) do
-  if data.raw.tile[tile_name] then
-    local item = {
-      type = "item",
-      name = item_name,
-      localised_description = { "item-description.landfill" },
-      icon = "__LandfillPainting__/graphics/icons/" .. item_name .. ".png",
-      icon_size = 64,
-      subgroup = "landfill",
-      order = "c[landfill]-a[" .. item_name .. "]",
-      stack_size = 100,
-      place_as_tile =
-      {
-        result = tile_name,
-        condition_size = 1,
-        condition = { layers = {} },
-        -- Enable all types of terrain that LandfillPainter allows the player to create to replace each other
-        tile_condition = table.deepcopy(overwritable_tiles),
-      },
-    }
-    data:extend({item})
-    if not data.raw.recipe[item_name] then
-      local recipe = util.table.deepcopy(baserecipe)
-      recipe.name = item_name
-      recipe.results = {{ type = "item", name = item_name, amount = 1 }}
-      data:extend({recipe})
-    end
-    add_recipe_unlock(item_name)
+  local tile = table.deepcopy(data.raw.tile[string.sub(tile_name, 4)] or data.raw.tile["landfill"])
+  tile.name = tile_name
+  data:extend({tile})
+  local allowed_tiles = table.deepcopy(overwritable_tiles)
+  for i, tile in pairs(allowed_tiles) do
+    if tile == string.sub(tile_name, 4) then
+	  table.remove(allowed_tiles, i)
+	end
   end
+  local item = {
+    type = "item",
+    name = item_name,
+    localised_description = { "item-description.landfill" },
+    icon = "__LandfillPainting__/graphics/icons/" .. item_name .. ".png",
+    icon_size = 64,
+    subgroup = "landfill",
+    order = "c[landfill]-a[" .. item_name .. "]",
+    stack_size = 100,
+    place_as_tile =
+    {
+      result = tile_name,
+      condition_size = 1,
+      condition = { layers = {} },
+      -- Enable all types of terrain that LandfillPainter allows the player to create to replace each other
+      tile_condition = table.deepcopy(allowed_tiles),
+    },
+  }
+  data:extend({item})
+  if not data.raw.recipe[item_name] then
+    local recipe = util.table.deepcopy(baserecipe)
+    recipe.name = item_name
+    recipe.results = {{ type = "item", name = item_name, amount = 1 }}
+    data:extend({recipe})
+  end
+  add_recipe_unlock(item_name)
 end
 
+local mine_landfill = data.raw.tile["landfill"].mined_sound
 for item_name, tile_name in pairs(item_tile_map) do
   local tile = data.raw.tile[tile_name]
   if tile then
     tile.can_be_part_of_blueprint = nil
     tile.build_sound = tile_sounds.building.landfill
     tile.minable = {mining_time = 0.5, result = item_name}
-    tile.mined_sound = sounds.deconstruct_bricks(0.8)
+    tile.mined_sound = mine_landfill
     tile.placeable_by = {item = item_name, count = 1}
     tile.is_foundation = true
   end
