@@ -1,5 +1,5 @@
 require "util"
-local tile_sounds = require("__base__/prototypes/tile/tile-sounds"
+local tile_sounds = require("__base__/prototypes/tile/tile-sounds")
 
 -- Define the names and tile type landfill we are adding
 local item_tile_map = {
