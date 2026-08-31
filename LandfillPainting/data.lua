@@ -106,6 +106,7 @@ for item_name, tile_name in pairs(item_tile_map) do
     if not data.raw.recipe[item_name] then
       local recipe = util.table.deepcopy(baserecipe)
       recipe.name = item_name
+      recipe.localised_name = nil
       recipe.results = {{ type = "item", name = item_name, amount = 1 }}
       data:extend({recipe})
     end
