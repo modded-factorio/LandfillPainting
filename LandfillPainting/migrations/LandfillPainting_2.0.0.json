@@ -1,0 +1,16 @@
+{
+  "item":
+  [
+    ["landfill-sand-3", "landfill-sand"],
+    ["landfill-dirt-4", "landfill-dirt"],
+    ["landfill-grass-1", "landfill-grass"],
+    ["landfill-red-desert-1", "landfill-red-desert"]
+  ],
+  "recipe":
+  [
+    ["landfill-sand-3", "landfill-sand"],
+    ["landfill-dirt-4", "landfill-dirt"],
+    ["landfill-grass-1", "landfill-grass"],
+    ["landfill-red-desert-1", "landfill-red-desert"]
+  ]
+}
