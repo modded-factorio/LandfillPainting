@@ -118,5 +118,6 @@ for item_name, tile_name in pairs(item_tile_map) do
   if tile then
     tile.can_be_part_of_blueprint = nil
     tile.build_sound = tile_sounds.building.landfill
+    tile.is_foundation = true
   end
 end
